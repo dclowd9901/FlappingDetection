@@ -120,7 +120,7 @@ function FlappingDetection(opts) {
       lastRatio,
       windowMargin = 0.02,
       averageRatio = 1,
-      nominalRatio = opts.nominalRatio || 1,
+      nominalRatio = opts.nominalRatio || 0.98,
       settled = false;
   
   /**
@@ -159,10 +159,10 @@ function FlappingDetection(opts) {
 
       // Services is in good state
       if (good) {
-        if (ratio < lastRatio) { // Something bad happened
+        if (ratio < nominalRatio) { // Service dipped below viability
           this.goToBadStateMode();
         } else {
-          if (stream.length > 2) { // Nothing bad happened
+          if (stream.length > 100) { // Nothing bad happened
             stream.shift();
             stream.shift(); // Two shifts for cleanup after a recovery state
           }
@@ -172,7 +172,7 @@ function FlappingDetection(opts) {
           stream.shift();
         }
         
-        if (ratio === nominalRatio) { // Service appears to have reached nominal status
+        if (ratio >= nominalRatio) { // Service appears to have reached nominal status
           averageRatio = nominalRatio;
           this.goToGoodStateMode();
         }
